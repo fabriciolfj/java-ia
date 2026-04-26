@@ -84,3 +84,43 @@ public class SemanticSearchExample {
         return dot / (float) (Math.sqrt(normA) * Math.sqrt(normB));
     }
 }
+
+/**
+ *O model.onnx só sabe fazer contas com tensores — ele não sabe o que é texto. O tokenizer.json é quem faz a ponte entre texto e números.
+ *
+ * criteria.loadModel()
+ *         ↓
+ * TextEmbeddingTranslatorFactory.newInstance()
+ *         ↓
+ * lê tokenizer.json da mesma pasta do model.onnx
+ *         ↓
+ * cria HuggingFaceTokenizer internamente
+ *         ↓
+ * cria TextEmbeddingTranslator (pre + post processing)
+ *
+ *
+ * predictor.predict("financiamento de veículo")
+ *         ↓
+ * [PRE-PROCESSING]  ← TextEmbeddingTranslator.processInput()
+ *   HuggingFaceTokenizer lê tokenizer.json
+ *   "financiamento de veículo" → [101, 8275, 1997, 2744, 102]
+ *   monta os tensors: input_ids, attention_mask, token_type_ids
+ *         ↓
+ * [INFERÊNCIA]  ← model.onnx executa
+ *   tensors entram no modelo ONNX
+ *   modelo faz as contas (384 dimensões)
+ *         ↓
+ * [POST-PROCESSING]  ← TextEmbeddingTranslator.processOutput()
+ *   pega tensor de saída
+ *   aplica mean pooling
+ *   aplica normalização L2
+ *   converte para float[]
+ *         ↓
+ * [0.6, -0.45, 0.8, ...]
+ *
+ *models/all-MiniLM-L6-v2/
+ * ├── model.onnx       ← carregado pelo OnnxRuntime (inferência)
+ * └── tokenizer.json   ← carregado pelo TextEmbeddingTranslatorFactory (pre/post processing)
+ *
+ *
+ */
