@@ -23,6 +23,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-webmvc'
     implementation 'org.nd4j:nd4j-api:1.0.0-M2.1'
     implementation 'com.github.tjake:jlama-core:0.8.4'
+    implementation 'dev.langchain4j:langchain4j-embeddings-all-minilm-l6-v2-q:1.14.1-beta24'
     implementation 'com.github.tjake:jlama-native:0.8.4'
     implementation 'com.anthropic:anthropic-java:2.26.0'
     implementation 'org.nd4j:nd4j-native-platform:1.0.0-M2.1'
